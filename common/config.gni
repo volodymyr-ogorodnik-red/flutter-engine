@@ -19,6 +19,9 @@ declare_args() {
 
   # Whether to use the legacy embedder when building for Fuchsia.
   flutter_enable_legacy_fuchsia_embedder = true
+
+  # Use wayland backend
+  use_wayland_backend = true
 }
 
 # feature_defines_list ---------------------------------------------------------
