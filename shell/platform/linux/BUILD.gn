@@ -159,7 +159,16 @@ source_set("flutter_linux") {
   configs += [
     "//flutter/shell/platform/linux/config:gtk",
     "//flutter/shell/platform/linux/config:epoxy",
+    "//flutter/shell/platform/linux/config:egl",
+    "//flutter/shell/platform/linux/config:wayland-egl",
+    "//third_party/khronos:khronos_headers",
   ]
+
+  if (!use_wayland_backend) {
+    configs += [
+      "//flutter/shell/platform/linux/config:x11",
+    ]
+  }
 
   defines = [ "FLUTTER_ENGINE_NO_PROTOTYPES" ]
 
@@ -212,7 +221,15 @@ executable("flutter_linux_unittests") {
 
   public_configs = [ "//flutter:config" ]
 
-  configs += [ "//flutter/shell/platform/linux/config:gtk" ]
+  configs += ["//flutter/shell/platform/linux/config:gtk",
+    "//flutter/shell/platform/linux/config:wayland-egl",
+  ]
+
+  if (!use_wayland_backend) {
+    configs += [
+      "//flutter/shell/platform/linux/config:x11",
+    ]
+  }
 
   defines = [
     "FLUTTER_ENGINE_NO_PROTOTYPES",
