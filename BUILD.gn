@@ -81,7 +81,7 @@ group("flutter") {
       "//flutter/lib/snapshot:kernel_platform_files",
     ]
 
-    if (_build_engine_artifacts) {
+    if (_build_engine_artifacts || full_dart_sdk) {
       public_deps += [
         ":dart_sdk",
         "//flutter/flutter_frontend_server:frontend_server",
