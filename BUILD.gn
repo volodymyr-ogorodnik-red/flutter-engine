@@ -57,7 +57,7 @@ group("flutter") {
       "//flutter/lib/snapshot:kernel_platform_files",
     ]
 
-    if (current_toolchain == host_toolchain) {
+    if (current_toolchain == host_toolchain || full_dart_sdk) {
       public_deps += [
         "//flutter/flutter_frontend_server:frontend_server",
         "//third_party/dart:create_sdk",
