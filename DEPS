@@ -104,7 +104,7 @@ allowed_hosts = [
 ]
 
 deps = {
-  'src': 'https://github.com/flutter/buildroot.git' + '@' + '4660f4a166979c64ff56f6b856b44ccc1dba5c63',
+  'src': 'https://github.com/LibertyGlobal/onemw-buildroot.git@lgi-2.15.1:fa5bd6b3d498e8f2541650414360ea4848440fbe',
 
    # Fuchsia compatibility
    #
@@ -141,7 +141,6 @@ deps = {
 
   'src/third_party/spirv_cross':
    Var('github_git') + '/KhronosGroup/SPIRV-Cross.git' + '@' + '418542eaefdb609f548d25a1e3962fb69d80da63',
-
 
    # Chromium-style
    #
