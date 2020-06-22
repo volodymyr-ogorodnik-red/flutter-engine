@@ -14,16 +14,26 @@ struct _FlAccessibilityPlugin {
 
 G_DEFINE_TYPE(FlAccessibilityPlugin, fl_accessibility_plugin, G_TYPE_OBJECT)
 
-// Called when a message is received on this channel
-static void message_cb(FlBasicMessageChannel* channel,
-                       FlValue* message,
-                       FlBasicMessageChannelResponseHandle* response_handle,
-                       gpointer user_data) {
+// Handles tooltip acessibility events from Flutter.
+static FlValue* handle_tooltip(FlValue* data) {
+  FlValue* message_value = fl_value_lookup_string(data, "message");
+  if (message_value == nullptr ||
+      fl_value_get_type(message_value) != FL_VALUE_TYPE_STRING) {
+    g_warning("Expected message string");
+    return nullptr;
+  }
+  const gchar* message = fl_value_get_string(message_value);
+
+  g_printerr("TOOLTIP '%s'\n", message);
+
+  return nullptr;
+}
+
+// Handles acessibility events from Flutter.
+static FlValue* handle_message(FlAccessibilityPlugin* self, FlValue* message) {
   if (fl_value_get_type(message) != FL_VALUE_TYPE_MAP) {
     g_warning("Ignoring unknown flutter/accessibility message type");
-    fl_basic_message_channel_respond(channel, response_handle, nullptr,
-                                     nullptr);
-    return;
+    return nullptr;
   }
 
   FlValue* type_value = fl_value_lookup_string(message, "type");
@@ -31,22 +41,32 @@ static void message_cb(FlBasicMessageChannel* channel,
       fl_value_get_type(type_value) != FL_VALUE_TYPE_STRING) {
     g_warning(
         "Ignoring unknown flutter/accessibility message with unknown type");
-    fl_basic_message_channel_respond(channel, response_handle, nullptr,
-                                     nullptr);
-    return;
+    return nullptr;
   }
   const gchar* type = fl_value_get_string(type_value);
+  FlValue* data = fl_value_lookup_string(message, "data");
 
   if (strcmp(type, "tooltip") == 0) {
-    g_debug("Got tooltip");
-    // FIXME: Make a callback
-    fl_basic_message_channel_respond(channel, response_handle, nullptr,
-                                     nullptr);
+    return handle_tooltip(data);
   } else {
     g_debug("Got unknown accessibility message: %s", type);
-    fl_basic_message_channel_respond(channel, response_handle, nullptr,
-                                     nullptr);
+    return nullptr;
   }
+}
+
+// Called when a message is received on this channel
+static void message_cb(FlBasicMessageChannel* channel,
+                       FlValue* message,
+                       FlBasicMessageChannelResponseHandle* response_handle,
+                       gpointer user_data) {
+  FlAccessibilityPlugin* self = FL_ACCESSIBILITY_PLUGIN(user_data);
+
+  g_autoptr(FlValue) response = handle_message(self, message);
+
+  g_autoptr(GError) error = nullptr;
+  if (!fl_basic_message_channel_respond(channel, response_handle, response,
+                                        &error))
+    g_warning("Failed to send message response: %s", error->message);
 }
 
 static void fl_accessibility_plugin_dispose(GObject* object) {
