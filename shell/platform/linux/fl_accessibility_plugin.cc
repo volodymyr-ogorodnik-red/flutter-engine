@@ -14,6 +14,51 @@ struct _FlAccessibilityPlugin {
 
 G_DEFINE_TYPE(FlAccessibilityPlugin, fl_accessibility_plugin, G_TYPE_OBJECT)
 
+// Handles announce acessibility events from Flutter.
+static FlValue* handle_announce(FlValue* data) {
+  FlValue* message_value = fl_value_lookup_string(data, "message");
+  if (message_value == nullptr ||
+      fl_value_get_type(message_value) != FL_VALUE_TYPE_STRING) {
+    g_warning("Expected message string");
+    return nullptr;
+  }
+  const gchar* message = fl_value_get_string(message_value);
+
+  g_printerr("ANNOUNCE '%s'\n", message);
+
+  return nullptr;
+}
+
+// Handles tap acessibility events from Flutter.
+static FlValue* handle_tap(FlValue* data) {
+  FlValue* node_id_value = fl_value_lookup_string(data, "nodeId");
+  if (node_id_value == nullptr ||
+      fl_value_get_type(node_id_value) != FL_VALUE_TYPE_INT) {
+    g_warning("Expected nodeId integer");
+    return nullptr;
+  }
+  int64_t node_id = fl_value_get_int(node_id_value);
+
+  g_printerr("TAP '%" G_GINT64_FORMAT "'\n", node_id);
+
+  return nullptr;
+}
+
+// Handles long press acessibility events from Flutter.
+static FlValue* handle_long_press(FlValue* data) {
+  FlValue* node_id_value = fl_value_lookup_string(data, "nodeId");
+  if (node_id_value == nullptr ||
+      fl_value_get_type(node_id_value) != FL_VALUE_TYPE_INT) {
+    g_warning("Expected nodeId integer");
+    return nullptr;
+  }
+  int64_t node_id = fl_value_get_int(node_id_value);
+
+  g_printerr("LONG-PRESS '%" G_GINT64_FORMAT "'\n", node_id);
+
+  return nullptr;
+}
+
 // Handles tooltip acessibility events from Flutter.
 static FlValue* handle_tooltip(FlValue* data) {
   FlValue* message_value = fl_value_lookup_string(data, "message");
@@ -46,7 +91,13 @@ static FlValue* handle_message(FlAccessibilityPlugin* self, FlValue* message) {
   const gchar* type = fl_value_get_string(type_value);
   FlValue* data = fl_value_lookup_string(message, "data");
 
-  if (strcmp(type, "tooltip") == 0) {
+  if (strcmp(type, "announce") == 0) {
+    return handle_announce(data);
+  } else if (strcmp(type, "tap") == 0) {
+    return handle_tap(data);
+  } else if (strcmp(type, "longPress") == 0) {
+    return handle_long_press(data);
+  } else if (strcmp(type, "tooltip") == 0) {
     return handle_tooltip(data);
   } else {
     g_debug("Got unknown accessibility message: %s", type);
