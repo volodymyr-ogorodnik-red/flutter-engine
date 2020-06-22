@@ -102,6 +102,7 @@ source_set("flutter_linux_sources") {
     "fl_text_input_plugin.cc",
     "fl_value.cc",
     "fl_view.cc",
+    "fl_view_accessible.cc",
   ]
 
   # Set flag to stop headers being directly included (library users should not do this)

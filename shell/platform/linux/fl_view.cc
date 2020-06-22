@@ -12,6 +12,7 @@
 #include "flutter/shell/platform/linux/fl_plugin_registrar_private.h"
 #include "flutter/shell/platform/linux/fl_renderer_x11.h"
 #include "flutter/shell/platform/linux/fl_text_input_plugin.h"
+#include "flutter/shell/platform/linux/fl_view_accessible.h"
 #include "flutter/shell/platform/linux/public/flutter_linux/fl_engine.h"
 #include "flutter/shell/platform/linux/public/flutter_linux/fl_plugin_registry.h"
 
@@ -359,6 +360,9 @@ static void fl_view_class_init(FlViewClass* klass) {
           fl_dart_project_get_type(),
           static_cast<GParamFlags>(G_PARAM_READWRITE | G_PARAM_CONSTRUCT_ONLY |
                                    G_PARAM_STATIC_STRINGS)));
+
+  gtk_widget_class_set_accessible_type(GTK_WIDGET_CLASS(klass),
+                                       fl_view_accessible_get_type());
 }
 
 static void fl_view_init(FlView* self) {

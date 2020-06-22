@@ -10,6 +10,8 @@
 
 #include <string.h>
 
+const int32_t kFlutterSemanticsCustomActionIdBatchEnd = -1;
+
 struct _FlutterEngine {
   bool running;
   FlutterPlatformMessageCallback platform_message_callback;
