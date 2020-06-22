@@ -252,6 +252,18 @@ static void fl_engine_platform_message_cb(const FlutterPlatformMessage* message,
   }
 }
 
+// Called when a semantic node update is received from the engine.
+static void fl_engine_update_semantics_node_cb(const FlutterSemanticsNode* node,
+                                               void* user_data) {
+  // FlEngine* self = FL_ENGINE(user_data);
+
+  g_printerr("Semantic Node\n");
+  g_printerr("  id: %d\n", node->id);
+  g_printerr("  label: %s\n", node->label);
+  g_printerr("  hint: %s\n", node->hint);
+  g_printerr("  value: %s\n", node->value);
+}
+
 // Called when a response to a sent platform message is received from the
 // engine.
 static void fl_engine_platform_message_response_cb(const uint8_t* data,
@@ -372,6 +384,7 @@ gboolean fl_engine_start(FlEngine* self, GError** error) {
   args.command_line_argv =
       reinterpret_cast<const char* const*>(command_line_args->pdata);
   args.platform_message_callback = fl_engine_platform_message_cb;
+  args.update_semantics_node_callback = fl_engine_update_semantics_node_cb;
   args.custom_task_runners = &custom_task_runners;
   args.shutdown_dart_vm_when_done = true;
 
@@ -403,6 +416,10 @@ gboolean fl_engine_start(FlEngine* self, GError** error) {
   }
 
   setup_locales(self);
+
+  result = FlutterEngineUpdateSemanticsEnabled(self->engine, TRUE);
+  if (result != kSuccess)
+    g_warning("Failed to enable accessibility features on Flutter engine");
 
   return TRUE;
 }

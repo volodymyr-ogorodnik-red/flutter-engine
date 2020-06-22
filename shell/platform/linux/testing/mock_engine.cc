@@ -389,3 +389,9 @@ FlutterEngineResult FlutterEngineUpdateLocales(FLUTTER_API_SYMBOL(FlutterEngine)
                                                size_t locales_count) {
   return kSuccess;
 }
+
+FlutterEngineResult FlutterEngineUpdateSemanticsEnabled(
+    FLUTTER_API_SYMBOL(FlutterEngine) engine,
+    bool enabled) {
+  return kSuccess;
+}

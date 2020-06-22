@@ -15,7 +15,7 @@ struct _FlAccessibilityPlugin {
 G_DEFINE_TYPE(FlAccessibilityPlugin, fl_accessibility_plugin, G_TYPE_OBJECT)
 
 // Handles announce acessibility events from Flutter.
-static FlValue* handle_announce(FlValue* data) {
+static FlValue* handle_announce(FlAccessibilityPlugin* self, FlValue* data) {
   FlValue* message_value = fl_value_lookup_string(data, "message");
   if (message_value == nullptr ||
       fl_value_get_type(message_value) != FL_VALUE_TYPE_STRING) {
@@ -30,37 +30,22 @@ static FlValue* handle_announce(FlValue* data) {
 }
 
 // Handles tap acessibility events from Flutter.
-static FlValue* handle_tap(FlValue* data) {
-  FlValue* node_id_value = fl_value_lookup_string(data, "nodeId");
-  if (node_id_value == nullptr ||
-      fl_value_get_type(node_id_value) != FL_VALUE_TYPE_INT) {
-    g_warning("Expected nodeId integer");
-    return nullptr;
-  }
-  int64_t node_id = fl_value_get_int(node_id_value);
-
+static FlValue* handle_tap(FlAccessibilityPlugin* self, int64_t node_id) {
   g_printerr("TAP '%" G_GINT64_FORMAT "'\n", node_id);
 
   return nullptr;
 }
 
 // Handles long press acessibility events from Flutter.
-static FlValue* handle_long_press(FlValue* data) {
-  FlValue* node_id_value = fl_value_lookup_string(data, "nodeId");
-  if (node_id_value == nullptr ||
-      fl_value_get_type(node_id_value) != FL_VALUE_TYPE_INT) {
-    g_warning("Expected nodeId integer");
-    return nullptr;
-  }
-  int64_t node_id = fl_value_get_int(node_id_value);
-
+static FlValue* handle_long_press(FlAccessibilityPlugin* self,
+                                  int64_t node_id) {
   g_printerr("LONG-PRESS '%" G_GINT64_FORMAT "'\n", node_id);
 
   return nullptr;
 }
 
 // Handles tooltip acessibility events from Flutter.
-static FlValue* handle_tooltip(FlValue* data) {
+static FlValue* handle_tooltip(FlAccessibilityPlugin* self, FlValue* data) {
   FlValue* message_value = fl_value_lookup_string(data, "message");
   if (message_value == nullptr ||
       fl_value_get_type(message_value) != FL_VALUE_TYPE_STRING) {
@@ -90,15 +75,20 @@ static FlValue* handle_message(FlAccessibilityPlugin* self, FlValue* message) {
   }
   const gchar* type = fl_value_get_string(type_value);
   FlValue* data = fl_value_lookup_string(message, "data");
+  FlValue* node_id_value = fl_value_lookup_string(message, "nodeId");
+  int64_t node_id = -1;
+  if (node_id_value != nullptr &&
+      fl_value_get_type(node_id_value) == FL_VALUE_TYPE_INT)
+    node_id = fl_value_get_int(node_id_value);
 
   if (strcmp(type, "announce") == 0) {
-    return handle_announce(data);
+    return handle_announce(self, data);
   } else if (strcmp(type, "tap") == 0) {
-    return handle_tap(data);
+    return handle_tap(self, node_id);
   } else if (strcmp(type, "longPress") == 0) {
-    return handle_long_press(data);
+    return handle_long_press(self, node_id);
   } else if (strcmp(type, "tooltip") == 0) {
-    return handle_tooltip(data);
+    return handle_tooltip(self, data);
   } else {
     g_debug("Got unknown accessibility message: %s", type);
     return nullptr;
