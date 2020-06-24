@@ -34,6 +34,11 @@ struct _FlEngine {
   FlEnginePlatformMessageHandler platform_message_handler;
   gpointer platform_message_handler_data;
   GDestroyNotify platform_message_handler_destroy_notify;
+
+  // Function to call when a semantic node is received.
+  FlEngineUpdateSemanticsNodeHandler update_semantics_node_handler;
+  gpointer update_semantics_node_handler_data;
+  GDestroyNotify update_semantics_node_handler_destroy_notify;
 };
 
 G_DEFINE_QUARK(fl_engine_error_quark, fl_engine_error)
@@ -255,20 +260,12 @@ static void fl_engine_platform_message_cb(const FlutterPlatformMessage* message,
 // Called when a semantic node update is received from the engine.
 static void fl_engine_update_semantics_node_cb(const FlutterSemanticsNode* node,
                                                void* user_data) {
-  // FlEngine* self = FL_ENGINE(user_data);
+  FlEngine* self = FL_ENGINE(user_data);
 
-  if (node->id == kFlutterSemanticsCustomActionIdBatchEnd) {
-    g_printerr("Semantic Node End\n");
-    return;
+  if (self->update_semantics_node_handler != nullptr) {
+    self->update_semantics_node_handler(
+        self, node, self->update_semantics_node_handler_data);
   }
-
-  g_printerr("Semantic Node\n");
-  g_printerr("  id: %d\n", node->id);
-  g_printerr("  label: %s\n", node->label);
-  g_printerr("  hint: %s\n", node->hint);
-  g_printerr("  value: %s\n", node->value);
-  g_printerr("  rect: %f %f %f %f (lrtb)\n", node->rect.left, node->rect.right,
-             node->rect.top, node->rect.bottom);
 }
 
 // Called when a response to a sent platform message is received from the
@@ -318,6 +315,13 @@ static void fl_engine_dispose(GObject* object) {
   }
   self->platform_message_handler_data = nullptr;
   self->platform_message_handler_destroy_notify = nullptr;
+
+  if (self->update_semantics_node_handler_destroy_notify) {
+    self->update_semantics_node_handler_destroy_notify(
+        self->update_semantics_node_handler_data);
+  }
+  self->update_semantics_node_handler_data = nullptr;
+  self->update_semantics_node_handler_destroy_notify = nullptr;
 
   G_OBJECT_CLASS(fl_engine_parent_class)->dispose(object);
 }
@@ -447,6 +451,24 @@ void fl_engine_set_platform_message_handler(
   self->platform_message_handler = handler;
   self->platform_message_handler_data = user_data;
   self->platform_message_handler_destroy_notify = destroy_notify;
+}
+
+void fl_engine_set_update_semantics_node_handler(
+    FlEngine* self,
+    FlEngineUpdateSemanticsNodeHandler handler,
+    gpointer user_data,
+    GDestroyNotify destroy_notify) {
+  g_return_if_fail(FL_IS_ENGINE(self));
+  g_return_if_fail(handler != nullptr);
+
+  if (self->update_semantics_node_handler_destroy_notify) {
+    self->update_semantics_node_handler_destroy_notify(
+        self->update_semantics_node_handler_data);
+  }
+
+  self->update_semantics_node_handler = handler;
+  self->update_semantics_node_handler_data = user_data;
+  self->update_semantics_node_handler_destroy_notify = destroy_notify;
 }
 
 gboolean fl_engine_send_platform_message_response(

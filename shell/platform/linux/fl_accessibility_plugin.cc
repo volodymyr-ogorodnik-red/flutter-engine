@@ -140,3 +140,21 @@ FlAccessibilityPlugin* fl_accessibility_plugin_new(
 
   return self;
 }
+
+void fl_accessibility_plugin_handle_update_semantics_node(
+    FlAccessibilityPlugin* plugin,
+    const FlutterSemanticsNode* node) {
+  if (node->id == kFlutterSemanticsCustomActionIdBatchEnd) {
+    g_printerr("Semantic Node End\n");
+    return;
+  }
+
+  g_printerr("Semantic Node\n");
+  g_printerr("  id: %d\n", node->id);
+  g_printerr("  label: %s\n", node->label);
+  g_printerr("  hint: %s\n", node->hint);
+  g_printerr("  value: %s\n", node->value);
+  g_printerr("  rect: %f %f %f %f (lrtb)\n", node->rect.left, node->rect.right,
+             node->rect.top, node->rect.bottom);
+  g_printerr("  child_count: %zi\n", node->child_count);
+}

@@ -7,6 +7,8 @@
 
 #include "flutter/shell/platform/linux/public/flutter_linux/fl_binary_messenger.h"
 
+#include "flutter/shell/platform/embedder/embedder.h"
+
 G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE(FlAccessibilityPlugin,
@@ -29,10 +31,21 @@ G_DECLARE_FINAL_TYPE(FlAccessibilityPlugin,
  * Creates a new plugin that implements SystemChannels.accessibility from the
  * Flutter services library.
  *
- * Returns: a new #FlAccessibilityPlugin
+ * Returns: a new #FlAccessibilityPlugin.
  */
 FlAccessibilityPlugin* fl_accessibility_plugin_new(
     FlBinaryMessenger* messenger);
+
+/**
+ * fl_accessibility_plugin_handle_update_semantics_node:
+ * @plugin: an #FlAccessibilityPlugin.
+ * @node: semantic node information.
+ *
+ * Handle a semantics node update.
+ */
+void fl_accessibility_plugin_handle_update_semantics_node(
+    FlAccessibilityPlugin* plugin,
+    const FlutterSemanticsNode* node);
 
 G_END_DECLS
 

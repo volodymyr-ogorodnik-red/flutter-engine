@@ -55,6 +55,15 @@ G_DEFINE_TYPE_WITH_CODE(
     G_IMPLEMENT_INTERFACE(fl_plugin_registry_get_type(),
                           fl_view_plugin_registry_iface_init))
 
+static void fl_view_update_semantics_node_cb(FlEngine* engine,
+                                             const FlutterSemanticsNode* node,
+                                             gpointer user_data) {
+  FlView* self = FL_VIEW(user_data);
+
+  fl_accessibility_plugin_handle_update_semantics_node(
+      self->accessibility_plugin, node);
+}
+
 // Converts a GDK button event into a Flutter event and sends it to the engine.
 static gboolean fl_view_send_pointer_button_event(FlView* self,
                                                   GdkEventButton* event) {
@@ -136,6 +145,8 @@ static void fl_view_constructed(GObject* object) {
 
   self->renderer = FL_RENDERER(fl_renderer_x11_new());
   self->engine = fl_engine_new(self->project, self->renderer);
+  fl_engine_set_update_semantics_node_handler(
+      self->engine, fl_view_update_semantics_node_cb, self, nullptr);
 
   // Create system channel handlers.
   FlBinaryMessenger* messenger = fl_engine_get_binary_messenger(self->engine);
