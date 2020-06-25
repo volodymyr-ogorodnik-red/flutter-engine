@@ -10,6 +10,9 @@ struct _FlAccessibilityPlugin {
   GObject parent_instance;
 
   FlBasicMessageChannel* channel;
+
+  // Semantics nodes keyed by ID
+  GHashTable* semantics_nodes_by_id;
 };
 
 G_DEFINE_TYPE(FlAccessibilityPlugin, fl_accessibility_plugin, G_TYPE_OBJECT)
@@ -123,7 +126,10 @@ static void fl_accessibility_plugin_class_init(
   G_OBJECT_CLASS(klass)->dispose = fl_accessibility_plugin_dispose;
 }
 
-static void fl_accessibility_plugin_init(FlAccessibilityPlugin* self) {}
+static void fl_accessibility_plugin_init(FlAccessibilityPlugin* self) {
+  self->semantics_nodes_by_id =
+      g_hash_table_new_full(g_int_hash, g_int_equal, nullptr, nullptr);
+}
 
 FlAccessibilityPlugin* fl_accessibility_plugin_new(
     FlBinaryMessenger* messenger) {
@@ -145,16 +151,51 @@ void fl_accessibility_plugin_handle_update_semantics_node(
     FlAccessibilityPlugin* plugin,
     const FlutterSemanticsNode* node) {
   if (node->id == kFlutterSemanticsCustomActionIdBatchEnd) {
-    g_printerr("Semantic Node End\n");
+    g_printerr("Semantics Nodes End\n");
     return;
   }
 
-  g_printerr("Semantic Node\n");
+  g_printerr("Semantics Node\n");
   g_printerr("  id: %d\n", node->id);
-  g_printerr("  label: %s\n", node->label);
-  g_printerr("  hint: %s\n", node->hint);
-  g_printerr("  value: %s\n", node->value);
+  if (node->label[0] != '\0')
+    g_printerr("  label: %s\n", node->label);
+  if (node->hint[0] != '\0')
+    g_printerr("  hint: %s\n", node->hint);
+  if (node->value[0] != '\0')
+    g_printerr("  value: %s\n", node->value);
+  if (node->increased_value[0] != '\0')
+    g_printerr("  increased_value: %s\n", node->increased_value);
+  if (node->decreased_value[0] != '\0')
+    g_printerr("  decreased_value: %s\n", node->decreased_value);
   g_printerr("  rect: %f %f %f %f (lrtb)\n", node->rect.left, node->rect.right,
              node->rect.top, node->rect.bottom);
-  g_printerr("  child_count: %zi\n", node->child_count);
+  g_printerr("  transform:");
+  if (node->transform.transX != 0 || node->transform.transY != 0)
+    g_printerr(" translate(%f %f)", node->transform.transX,
+               node->transform.transY);
+  if (node->transform.scaleX != 1 || node->transform.scaleY != 1)
+    g_printerr(" scale(%f %f)", node->transform.scaleX, node->transform.scaleY);
+  if (node->transform.skewX != 0 || node->transform.skewY != 0)
+    g_printerr(" skew(%f %f)", node->transform.skewX, node->transform.skewY);
+  if (node->transform.pers0 != 0 || node->transform.pers1 != 0 ||
+      node->transform.pers2 != 1)
+    g_printerr(" perspective(%f %f %f)", node->transform.pers0,
+               node->transform.pers1, node->transform.pers2);
+  g_printerr("\n");
+  if (node->child_count > 0) {
+    g_printerr("  children_in_traversal_order:");
+    for (size_t i = 0; i < node->child_count; i++)
+      g_printerr(" %d", node->children_in_traversal_order[i]);
+    g_printerr("\n");
+    g_printerr("  children_in_hit_test_order:");
+    for (size_t i = 0; i < node->child_count; i++)
+      g_printerr(" %d", node->children_in_hit_test_order[i]);
+    g_printerr("\n");
+  }
+  if (node->custom_accessibility_actions_count > 0) {
+    g_printerr("  custom_accessibility_actions:");
+    for (size_t i = 0; i < node->custom_accessibility_actions_count; i++)
+      g_printerr(" %d", node->custom_accessibility_actions[i]);
+    g_printerr("\n");
+  }
 }
