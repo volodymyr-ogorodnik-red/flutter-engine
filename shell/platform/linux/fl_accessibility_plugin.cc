@@ -147,6 +147,24 @@ FlAccessibilityPlugin* fl_accessibility_plugin_new(
   return self;
 }
 
+static gboolean has_flag(FlutterSemanticsFlag* flags,
+                         FlutterSemanticsFlag flag) {
+  if ((*flags & flag) == 0)
+    return FALSE;
+
+  *flags = static_cast<FlutterSemanticsFlag>(*flags ^ flag);
+  return TRUE;
+}
+
+static gboolean has_action(FlutterSemanticsAction* actions,
+                           FlutterSemanticsAction action) {
+  if ((*actions & action) == 0)
+    return FALSE;
+
+  *actions = static_cast<FlutterSemanticsAction>(*actions ^ action);
+  return TRUE;
+}
+
 void fl_accessibility_plugin_handle_update_semantics_node(
     FlAccessibilityPlugin* plugin,
     const FlutterSemanticsNode* node) {
@@ -157,6 +175,108 @@ void fl_accessibility_plugin_handle_update_semantics_node(
 
   g_printerr("Semantics Node\n");
   g_printerr("  id: %d\n", node->id);
+  if (node->flags != 0) {
+    g_printerr("  flags:");
+    FlutterSemanticsFlag flags = node->flags;
+    if (has_flag(&flags, kFlutterSemanticsFlagHasCheckedState))
+      g_printerr(" HasCheckedState");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsChecked))
+      g_printerr(" IsChecked");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsSelected))
+      g_printerr(" IsSelected");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsButton))
+      g_printerr(" IsButton");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsTextField))
+      g_printerr(" IsTextField");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsFocused))
+      g_printerr(" IsFocused");
+    if (has_flag(&flags, kFlutterSemanticsFlagHasEnabledState))
+      g_printerr(" HasEnabledState");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsEnabled))
+      g_printerr(" IsEnabled");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsInMutuallyExclusiveGroup))
+      g_printerr(" IsInMutuallyExclusiveGroup");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsHeader))
+      g_printerr(" IsHeader");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsObscured))
+      g_printerr(" IsObscured");
+    if (has_flag(&flags, kFlutterSemanticsFlagScopesRoute))
+      g_printerr(" ScopesRoute");
+    if (has_flag(&flags, kFlutterSemanticsFlagNamesRoute))
+      g_printerr(" NamesRoute");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsHidden))
+      g_printerr(" IsHidden");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsImage))
+      g_printerr(" IsImage");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsLiveRegion))
+      g_printerr(" IsLiveRegion");
+    if (has_flag(&flags, kFlutterSemanticsFlagHasToggledState))
+      g_printerr(" HasToggledState");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsToggled))
+      g_printerr(" IsToggled");
+    if (has_flag(&flags, kFlutterSemanticsFlagHasImplicitScrolling))
+      g_printerr(" HasImplicitScrolling");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsReadOnly))
+      g_printerr(" IsReadOnly");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsFocusable))
+      g_printerr(" IsFocusable");
+    if (has_flag(&flags, kFlutterSemanticsFlagIsLink))
+      g_printerr(" IsLink");
+    if (flags != 0)
+      g_printerr(" 0x%x", flags);
+    g_printerr("\n");
+  }
+  if (node->actions != 0) {
+    g_printerr("  actions:");
+    FlutterSemanticsAction actions = node->actions;
+    if (has_action(&actions, kFlutterSemanticsActionTap))
+      g_printerr(" Tap");
+    if (has_action(&actions, kFlutterSemanticsActionLongPress))
+      g_printerr(" LongPress");
+    if (has_action(&actions, kFlutterSemanticsActionScrollLeft))
+      g_printerr(" ScrollLeft");
+    if (has_action(&actions, kFlutterSemanticsActionScrollRight))
+      g_printerr(" ScrollRight");
+    if (has_action(&actions, kFlutterSemanticsActionScrollUp))
+      g_printerr(" ScrollUp");
+    if (has_action(&actions, kFlutterSemanticsActionScrollDown))
+      g_printerr(" ScrollDown");
+    if (has_action(&actions, kFlutterSemanticsActionIncrease))
+      g_printerr(" Increase");
+    if (has_action(&actions, kFlutterSemanticsActionDecrease))
+      g_printerr(" Decrease");
+    if (has_action(&actions, kFlutterSemanticsActionShowOnScreen))
+      g_printerr(" ShowOnScreen");
+    if (has_action(&actions,
+                   kFlutterSemanticsActionMoveCursorForwardByCharacter))
+      g_printerr(" MoveCursorForwardByCharacter");
+    if (has_action(&actions,
+                   kFlutterSemanticsActionMoveCursorBackwardByCharacter))
+      g_printerr(" MoveCursorBackwardByCharacter");
+    if (has_action(&actions, kFlutterSemanticsActionSetSelection))
+      g_printerr(" SetSelection");
+    if (has_action(&actions, kFlutterSemanticsActionCopy))
+      g_printerr(" Copy");
+    if (has_action(&actions, kFlutterSemanticsActionCut))
+      g_printerr(" Cut");
+    if (has_action(&actions, kFlutterSemanticsActionPaste))
+      g_printerr(" Paste");
+    if (has_action(&actions, kFlutterSemanticsActionDidGainAccessibilityFocus))
+      g_printerr(" DidGainAccessibilityFocus");
+    if (has_action(&actions, kFlutterSemanticsActionDidLoseAccessibilityFocus))
+      g_printerr(" DidLoseAccessibilityFocus");
+    if (has_action(&actions, kFlutterSemanticsActionCustomAction))
+      g_printerr(" CustomAction");
+    if (has_action(&actions, kFlutterSemanticsActionDismiss))
+      g_printerr(" Dismiss");
+    if (has_action(&actions, kFlutterSemanticsActionMoveCursorForwardByWord))
+      g_printerr(" MoveCursorForwardByWord");
+    if (has_action(&actions, kFlutterSemanticsActionMoveCursorBackwardByWord))
+      g_printerr(" MoveCursorBackwardByWord");
+    if (actions != 0)
+      g_printerr(" 0x%x", actions);
+    g_printerr("\n");
+  }
   if (node->label[0] != '\0')
     g_printerr("  label: %s\n", node->label);
   if (node->hint[0] != '\0')
