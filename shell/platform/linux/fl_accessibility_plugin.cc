@@ -277,6 +277,24 @@ void fl_accessibility_plugin_handle_update_semantics_node(
       g_printerr(" 0x%x", actions);
     g_printerr("\n");
   }
+  if (node->text_selection_base != -1)
+    g_printerr("  text_selection_base: %d\n", node->text_selection_base);
+  if (node->text_selection_extent != -1)
+    g_printerr("  text_selection_extent: %d\n", node->text_selection_extent);
+  if (node->scroll_child_count != 0)
+    g_printerr("  scroll_child_count: %d\n", node->scroll_child_count);
+  if (node->scroll_index != 0)
+    g_printerr("  scroll_index: %d\n", node->scroll_index);
+  if (!isnan(node->scroll_position))
+    g_printerr("  scroll_position: %g\n", node->scroll_position);
+  if (!isnan(node->scroll_extent_max))
+    g_printerr("  scroll_extent_max: %g\n", node->scroll_extent_max);
+  if (!isnan(node->scroll_extent_min))
+    g_printerr("  scroll_extent_min: %g\n", node->scroll_extent_min);
+  if (node->elevation != 0)
+    g_printerr("  elevation: %g\n", node->elevation);
+  if (node->thickness != 0)
+    g_printerr("  thickness: %g\n", node->thickness);
   if (node->label[0] != '\0')
     g_printerr("  label: %s\n", node->label);
   if (node->hint[0] != '\0')
@@ -287,21 +305,43 @@ void fl_accessibility_plugin_handle_update_semantics_node(
     g_printerr("  increased_value: %s\n", node->increased_value);
   if (node->decreased_value[0] != '\0')
     g_printerr("  decreased_value: %s\n", node->decreased_value);
-  g_printerr("  rect: %f %f %f %f (lrtb)\n", node->rect.left, node->rect.right,
+  if (node->text_direction != kFlutterTextDirectionUnknown) {
+    g_printerr("  text_direction: ");
+    switch (node->text_direction) {
+      case kFlutterTextDirectionRTL:
+        g_printerr("RTL");
+        break;
+      case kFlutterTextDirectionLTR:
+        g_printerr("LTR");
+        break;
+      default:
+        g_printerr("%d\n", node->text_direction);
+        break;
+    }
+    g_printerr("\n");
+  }
+  g_printerr("  rect: %g %g %g %g (lrtb)\n", node->rect.left, node->rect.right,
              node->rect.top, node->rect.bottom);
-  g_printerr("  transform:");
-  if (node->transform.transX != 0 || node->transform.transY != 0)
-    g_printerr(" translate(%f %f)", node->transform.transX,
-               node->transform.transY);
-  if (node->transform.scaleX != 1 || node->transform.scaleY != 1)
-    g_printerr(" scale(%f %f)", node->transform.scaleX, node->transform.scaleY);
-  if (node->transform.skewX != 0 || node->transform.skewY != 0)
-    g_printerr(" skew(%f %f)", node->transform.skewX, node->transform.skewY);
-  if (node->transform.pers0 != 0 || node->transform.pers1 != 0 ||
-      node->transform.pers2 != 1)
-    g_printerr(" perspective(%f %f %f)", node->transform.pers0,
-               node->transform.pers1, node->transform.pers2);
-  g_printerr("\n");
+  if (node->transform.transX != 0 || node->transform.transY != 0 ||
+      node->transform.scaleX != 1 || node->transform.scaleY != 1 ||
+      node->transform.skewX != 0 || node->transform.skewY != 0 ||
+      node->transform.pers0 != 0 || node->transform.pers1 != 0 ||
+      node->transform.pers2 != 1) {
+    g_printerr("  transform:");
+    if (node->transform.transX != 0 || node->transform.transY != 0)
+      g_printerr(" translate(%g, %g)", node->transform.transX,
+                 node->transform.transY);
+    if (node->transform.scaleX != 1 || node->transform.scaleY != 1)
+      g_printerr(" scale(%g, %g)", node->transform.scaleX,
+                 node->transform.scaleY);
+    if (node->transform.skewX != 0 || node->transform.skewY != 0)
+      g_printerr(" skew(%g, %g)", node->transform.skewX, node->transform.skewY);
+    if (node->transform.pers0 != 0 || node->transform.pers1 != 0 ||
+        node->transform.pers2 != 1)
+      g_printerr(" perspective(%g, %g, %g)", node->transform.pers0,
+                 node->transform.pers1, node->transform.pers2);
+    g_printerr("\n");
+  }
   if (node->child_count > 0) {
     g_printerr("  children_in_traversal_order:");
     for (size_t i = 0; i < node->child_count; i++)
@@ -318,4 +358,7 @@ void fl_accessibility_plugin_handle_update_semantics_node(
       g_printerr(" %d", node->custom_accessibility_actions[i]);
     g_printerr("\n");
   }
+  if (node->platform_view_id != -1)
+    g_printerr("  platform_view_id: %" G_GINT64_FORMAT "\n",
+               node->platform_view_id);
 }
