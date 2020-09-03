@@ -19,6 +19,9 @@ static FlAccessible* get_node(FlViewAccessible* self, int32_t id) {
       g_hash_table_lookup(self->semantics_nodes_by_id, GINT_TO_POINTER(id)));
   if (accessible == nullptr) {
     accessible = fl_accessible_new(id);
+    if (id == 0) {
+      fl_accessible_set_parent(accessible, ATK_OBJECT(self));
+    }
     g_hash_table_insert(self->semantics_nodes_by_id, GINT_TO_POINTER(id),
                         reinterpret_cast<gpointer>(accessible));
   }
@@ -93,8 +96,9 @@ void fl_view_accessible_handle_update_semantics_node(
 
   g_autoptr(GPtrArray) children = g_ptr_array_new();
   for (size_t i = 0; i < node->child_count; i++) {
-    g_ptr_array_add(children,
-                    get_node(self, node->children_in_traversal_order[i]));
+    FlAccessible* child = get_node(self, node->children_in_traversal_order[i]);
+    fl_accessible_set_parent(child, ATK_OBJECT(accessible));
+    g_ptr_array_add(children, child);
   }
   fl_accessible_set_children(accessible, children);
 

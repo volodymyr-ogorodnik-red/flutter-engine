@@ -7,6 +7,8 @@
 
 #include <gtk/gtk.h>
 
+#include "flutter/shell/platform/linux/public/flutter_linux/fl_view.h"
+
 G_BEGIN_DECLS
 
 #define FL_ACCESSIBLE(obj) \
@@ -38,6 +40,8 @@ struct _FlAccessibleClass {
  * Returns: a new #FlAccessible.
  */
 FlAccessible* fl_accessible_new(int32_t id);
+
+void fl_accessible_set_parent(FlAccessible* accessible, AtkObject* parent);
 
 void fl_accessible_set_name(FlAccessible* accessible, const gchar* name);
 

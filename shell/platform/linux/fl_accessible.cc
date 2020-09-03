@@ -7,6 +7,7 @@
 struct _FlAccessible {
   AtkObject parent_instance;
 
+  AtkObject* parent;
   int32_t id;
   gchar* name;
   gint x, y, width, height;
@@ -22,10 +23,26 @@ G_DEFINE_TYPE_WITH_CODE(
     G_IMPLEMENT_INTERFACE(ATK_TYPE_COMPONENT,
                           fl_accessible_component_interface_init))
 
+static void fl_accessible_dispose(GObject* object) {
+  FlAccessible* self = FL_ACCESSIBLE(object);
+
+  g_clear_pointer(&self->name, g_free);
+  g_clear_pointer(&self->children, g_ptr_array_unref);
+
+  G_OBJECT_CLASS(fl_accessible_parent_class)->dispose(object);
+}
+
 // Implements AtkObject::get_name.
 static const gchar* fl_accessible_get_name(AtkObject* accessible) {
   FlAccessible* self = FL_ACCESSIBLE(accessible);
   return self->name;
+}
+
+// Implements AtkObject::get_parent.
+static AtkObject* fl_accessible_get_parent(AtkObject* accessible) {
+  FlAccessible* self = FL_ACCESSIBLE(accessible);
+  g_printerr("get_parent %d -> %p\n", self->id, self->parent);
+  return self->parent;
 }
 
 // Implements AtkObject::get_n_children.
@@ -59,16 +76,29 @@ static void fl_accessible_get_extents(AtkComponent* component,
                                       gint* height,
                                       AtkCoordType coord_type) {
   FlAccessible* self = FL_ACCESSIBLE(component);
-  // FIXME coord_type
-  *x = self->x;
-  *y = self->y;
+
+  *x = 0;
+  *y = 0;
+  if (self->parent != nullptr) {
+    atk_component_get_extents(ATK_COMPONENT(self->parent), x, y, NULL, NULL,
+                              coord_type);
+  }
+
+  *x += self->x;
+  *y += self->y;
   *width = self->width;
   *height = self->height;
 }
 
+// Implements AtkComponent::get_layer.
+static AtkLayer fl_accessible_get_layer(AtkComponent* component) {
+  return ATK_LAYER_WIDGET;
+}
+
 static void fl_accessible_class_init(FlAccessibleClass* klass) {
-  // FIXME: Dispose
+  G_OBJECT_CLASS(klass)->dispose = fl_accessible_dispose;
   ATK_OBJECT_CLASS(klass)->get_name = fl_accessible_get_name;
+  ATK_OBJECT_CLASS(klass)->get_parent = fl_accessible_get_parent;
   ATK_OBJECT_CLASS(klass)->get_n_children = fl_accessible_get_n_children;
   ATK_OBJECT_CLASS(klass)->ref_child = fl_accessible_ref_child;
   ATK_OBJECT_CLASS(klass)->get_role = fl_accessible_get_role;
@@ -76,6 +106,7 @@ static void fl_accessible_class_init(FlAccessibleClass* klass) {
 
 static void fl_accessible_component_interface_init(AtkComponentIface* iface) {
   iface->get_extents = fl_accessible_get_extents;
+  iface->get_layer = fl_accessible_get_layer;
 }
 
 static void fl_accessible_init(FlAccessible* self) {
@@ -87,6 +118,11 @@ FlAccessible* fl_accessible_new(int32_t id) {
       g_object_new(fl_accessible_get_type(), nullptr));
   self->id = id;
   return self;
+}
+
+void fl_accessible_set_parent(FlAccessible* self, AtkObject* parent) {
+  g_return_if_fail(FL_IS_ATK_OBJECT(self));
+  self->parent = parent;  // FIXME: Weak ref?
 }
 
 void fl_accessible_set_name(FlAccessible* self, const gchar* name) {
