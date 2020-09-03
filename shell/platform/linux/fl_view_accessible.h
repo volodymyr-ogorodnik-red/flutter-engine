@@ -11,6 +11,8 @@
 
 #include <gtk/gtk-a11y.h>
 
+#include "flutter/shell/platform/embedder/embedder.h"
+
 G_BEGIN_DECLS
 
 G_DECLARE_FINAL_TYPE(FlViewAccessible,
@@ -18,6 +20,17 @@ G_DECLARE_FINAL_TYPE(FlViewAccessible,
                      FL,
                      VIEW_ACCESSIBLE,
                      GtkWidgetAccessible)
+
+/**
+ * fl_view_accessible_handle_update_semantics_node:
+ * @accessible: an #FlViewAccessible.
+ * @node: semantic node information.
+ *
+ * Handle a semantics node update.
+ */
+void fl_view_accessible_handle_update_semantics_node(
+    FlViewAccessible* accessible,
+    const FlutterSemanticsNode* node);
 
 G_END_DECLS
 
