@@ -41,7 +41,6 @@ static const gchar* fl_accessible_get_name(AtkObject* accessible) {
 // Implements AtkObject::get_parent.
 static AtkObject* fl_accessible_get_parent(AtkObject* accessible) {
   FlAccessible* self = FL_ACCESSIBLE(accessible);
-  g_printerr("get_parent %d -> %p\n", self->id, self->parent);
   return self->parent;
 }
 
