@@ -28,7 +28,7 @@ VsyncWaiterFallback::~VsyncWaiterFallback() = default;
 // |VsyncWaiter|
 void VsyncWaiterFallback::AwaitVSync() {
   constexpr fml::TimeDelta kSingleFrameInterval =
-      fml::TimeDelta::FromSecondsF(1.0 / 60.0);
+      fml::TimeDelta::FromSecondsF(1.0 / 50.0);
 
   auto next =
       SnapToNextTick(fml::TimePoint::Now(), phase_, kSingleFrameInterval);

@@ -18,7 +18,7 @@ using namespace std::chrono_literals;
 using Milliseconds = std::chrono::duration<double, std::milli>;
 
 // Default to 60fps.
-constexpr Milliseconds kDefaultFrameBudget = Milliseconds(1s) / 60;
+constexpr Milliseconds kDefaultFrameBudget = Milliseconds(1s) / 50;
 
 template <typename T>
 Milliseconds RefreshRateToFrameBudget(T refresh_rate) {
