@@ -5,7 +5,7 @@
 #include "flutter/shell/platform/linux/public/flutter_linux/fl_view.h"
 
 #include <gdk/gdkwayland.h>
-#ifdef GDK_WINDOWING_X11
+#if defined(GDK_WINDOWING_X11) && !defined(DISALBE_X11_BACKEND)
 #include <gdk/gdkx.h>
 #endif
 #include <cstring>
@@ -146,7 +146,7 @@ static void fl_view_plugin_registry_iface_init(
 }
 
 static FlRenderer* fl_view_get_renderer_for_display(GdkDisplay* display) {
-#ifdef GDK_WINDOWING_X11
+#if defined(GDK_WINDOWING_X11) && !defined(DISALBE_X11_BACKEND)
   if (GDK_IS_X11_DISPLAY(display)) {
     return FL_RENDERER(fl_renderer_x11_new());
   }
