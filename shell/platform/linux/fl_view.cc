@@ -6,6 +6,10 @@
 
 #include "flutter/shell/platform/linux/fl_view_private.h"
 
+#include <gdk/gdkwayland.h>
+#if defined(GDK_WINDOWING_X11) && !defined(DISALBE_X11_BACKEND)
+#include <gdk/gdkx.h>
+#endif
 #include <cstring>
 
 #include "flutter/shell/platform/linux/fl_accessibility_plugin.h"
