@@ -7,7 +7,7 @@
 
 #include <gdk/gdk.h>
 
-#ifdef GDK_WINDOWING_X11
+#if defined(GDK_WINDOWING_X11) && !defined(DISALBE_X11_BACKEND)
 #include <gdk/gdkx.h>
 
 #include "flutter/shell/platform/linux/fl_renderer.h"
@@ -38,6 +38,6 @@ FlRendererX11* fl_renderer_x11_new();
 
 G_END_DECLS
 
-#endif  // GDK_WINDOWING_X11
+#endif  // defined(GDK_WINDOWING_X11) && !defined(DISALBE_X11_BACKEND)
 
 #endif  // FLUTTER_SHELL_PLATFORM_LINUX_FL_RENDERER_X11_H_
