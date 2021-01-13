@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 #include "fl_renderer_x11.h"
-#ifdef GDK_WINDOWING_X11
+#if defined(GDK_WINDOWING_X11) && !defined(DISALBE_X11_BACKEND)
 
 #include <X11/X.h>
 
@@ -134,4 +134,4 @@ FlRendererX11* fl_renderer_x11_new() {
   return FL_RENDERER_X11(g_object_new(fl_renderer_x11_get_type(), nullptr));
 }
 
-#endif  // GDK_WINDOWING_X11
+#endif  // defined(GDK_WINDOWING_X11) && !defined(DISALBE_X11_BACKEND)
