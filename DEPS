@@ -100,7 +100,7 @@ allowed_hosts = [
 ]
 
 deps = {
-  'src': 'https://github.com/dwrobel/buildroot.git@lgi-2.12.0-259.12.beta:99f027a927adb8222b31264c7ab0bc4bd7313cff',
+  'src': 'https://github.com/dwrobel/buildroot.git@lgi-2.12.2:0a64e17a4a2a76a91570568f22191f2f5aa642f9',
 
    # Fuchsia compatibility
    #
