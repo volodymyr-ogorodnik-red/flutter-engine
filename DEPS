@@ -367,7 +367,7 @@ deps = {
    Var('flutter_git') + '/third_party/expat' + '@' + '1441fc5252746e53b285d15be7e65e4cd74d97eb',
 
   'src/third_party/freetype2':
-   Var('flutter_git') + '/third_party/freetype2' + '@' + '1f03c1b2d7f2ae832a4fbe9d12bd96c3c15bbece',
+   Var('flutter_git') + '/third_party/freetype2' + '@' + '3234e16d2322c936f777d1ef046e689e78b6c52e',
 
   'src/third_party/root_certificates':
    Var('dart_git') + '/root_certificates.git' + '@' + Var('dart_root_certificates_rev'),
